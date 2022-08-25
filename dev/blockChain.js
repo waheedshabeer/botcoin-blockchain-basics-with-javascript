@@ -1,3 +1,5 @@
+const sha256 = require("sha256");
+
 function BotCoin() {
   this.chain = [];
   this.pendingTransactions = [];
@@ -36,6 +38,16 @@ BotCoin.prototype.createNewTransaction = function (
   this.pendingTransactions.push(newTransaction);
 
   return this.getLastNode["index"] + 1;
+};
+
+BotCoin.prototype.hashBlock = function (
+  previousBlockHash,
+  nonce,
+  currentBlock
+) {
+  const stringForHash =
+    previousBlockHash + nonce.toString() + JSON.stringify(currentBlock);
+  return sha256(stringForHash);
 };
 
 module.exports = BotCoin;

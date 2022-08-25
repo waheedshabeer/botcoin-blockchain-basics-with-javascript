@@ -11,4 +11,8 @@ botCoin.createNewTransaction(2300, "Waheed", "Shoaib");
 botCoin.createNewTransaction(400, "Waheed", "Shoaib");
 botCoin.createNewBotCoin(3, "3", "4");
 
-logData(botCoin);
+logData(
+  botCoin.hashBlock(botCoin.getLastNode().hash, 1, botCoin.getLastNode())
+);
+
+return;
