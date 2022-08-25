@@ -2,6 +2,8 @@ const { logData } = require("../utils/log");
 const BotCoin = require("./blockChain");
 
 const botCoin = new BotCoin();
+console.log(botCoin);
+return;
 botCoin.createNewBlockChain(1, "1", "2");
 botCoin.createNewTransaction(100, "Waheed", "Asif");
 botCoin.createNewBlockChain(2, "2", "3");
