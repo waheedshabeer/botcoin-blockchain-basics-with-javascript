@@ -1,2 +1,3 @@
-const { logData } = require("./log");
+const { logData } = require("../utils/log");
+
 logData("Hello BlockChain");
