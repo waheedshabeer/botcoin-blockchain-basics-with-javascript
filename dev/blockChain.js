@@ -1,12 +1,16 @@
 const sha256 = require("sha256");
 
-function BotCoin() {
+function BlockChain() {
   this.chain = [];
   this.pendingTransactions = [];
 }
 
-BotCoin.prototype.createNewBotCoin = function (nonce, previousHash, hash) {
-  const newBotCoin = {
+BlockChain.prototype.createNewBlockChain = function (
+  nonce,
+  previousHash,
+  hash
+) {
+  const newBlockChain = {
     index: this.chain.length,
     nonce,
     previousHash,
@@ -16,15 +20,15 @@ BotCoin.prototype.createNewBotCoin = function (nonce, previousHash, hash) {
   };
 
   this.pendingTransactions = [];
-  this.chain.push(newBotCoin);
-  return newBotCoin;
+  this.chain.push(newBlockChain);
+  return newBlockChain;
 };
 
-BotCoin.prototype.getLastNode = function (params) {
+BlockChain.prototype.getLastNode = function (params) {
   return this.chain[this.chain.length - 1];
 };
 
-BotCoin.prototype.createNewTransaction = function (
+BlockChain.prototype.createNewTransaction = function (
   amount,
   senderAddress,
   receiverAddress
@@ -40,14 +44,28 @@ BotCoin.prototype.createNewTransaction = function (
   return this.getLastNode["index"] + 1;
 };
 
-BotCoin.prototype.hashBlock = function (
+BlockChain.prototype.hashBlock = function (
   previousBlockHash,
-  nonce,
-  currentBlock
+  currentBlock,
+  nonce
 ) {
   const stringForHash =
-    previousBlockHash + nonce.toString() + JSON.stringify(currentBlock);
+    previousBlockHash + JSON.stringify(currentBlock) + nonce.toString();
   return sha256(stringForHash);
 };
 
-module.exports = BotCoin;
+BlockChain.prototype.proofOfWork = function (
+  previousBlockHash,
+  currentBlockData
+) {
+  let nonse = 0;
+  let hash = this.hashBlock(previousBlockHash, currentBlockData, nonse);
+
+  while (hash.substring(0, 4) !== "0000") {
+    nonse++;
+    hash = this.hashBlock(previousBlockHash, currentBlockData, nonse);
+  }
+  return nonse;
+};
+
+module.exports = BlockChain;
