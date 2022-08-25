@@ -1,0 +1,11 @@
+{
+  "name": "botcoin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "blockChain": "node dev/runTest.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
