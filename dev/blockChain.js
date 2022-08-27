@@ -1,9 +1,12 @@
 const sha256 = require("sha256");
+const currentNodeURL = process.argv[3];
 
 function BlockChain() {
   this.chain = [];
   this.pendingTransactions = [];
   this.createNewBlockChain(100, "00", "GENISISBLOCK");
+  this.currentNodeURL = currentNodeURL;
+  this.networkNodes = [];
 }
 
 BlockChain.prototype.createNewBlockChain = function (
