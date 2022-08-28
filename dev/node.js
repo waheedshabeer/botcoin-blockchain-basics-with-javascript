@@ -1,4 +1,4 @@
-const { response, failedResponse } = require("../res/response");
+const { response, failedResponse } = require("../utils/response");
 const { minningReward } = require("../utils/values");
 const BlockChain = require("./blockChain");
 const bodyParser = require("body-parser");
@@ -10,6 +10,7 @@ const {
   registerNodesBulk,
   transaction,
   mine,
+  transactionBroadcast,
 } = require("../utils/endpoints");
 const uuid = require("uuid");
 
@@ -57,13 +58,46 @@ app.get(mine, (req, res) => {
 
 app.post(transaction, (req, res) => {
   try {
+    const { newTrsansaction } = req.body;
+    const block = botCoin.addTransactionToPendingTransactions(newTrsansaction);
+    response(
+      res,
+      req.body,
+      `Broadcasted transaction will be saved at Block ${block}`
+    );
+  } catch (error) {
+    failedResponse(res, error);
+  }
+});
+
+app.post(transactionBroadcast, (req, res) => {
+  try {
     const { amount, senderAddress, receiverAddress } = req.body;
-    const block = botCoin.createNewTransaction(
+    const newTrsansaction = botCoin.createNewTransaction(
       amount,
       senderAddress,
       receiverAddress
     );
-    response(res, req.body, `Your transaction will be saved at Block ${block}`);
+    const block = botCoin.addTransactionToPendingTransactions(newTrsansaction);
+    let allPromises = [];
+    botCoin.networkNodes.forEach((nodeURL) => {
+      allPromises.push(
+        axios({
+          url: nodeURL + transaction,
+          method: "POST",
+          data: {
+            newTrsansaction,
+          },
+        })
+      );
+    });
+    Promise.all(allPromises).then(() => {
+      response(
+        res,
+        req.body,
+        `Transaction is broadcasted to ${botCoin.networkNodes.length} nodes and will be saved at Block ${block}`
+      );
+    });
   } catch (error) {
     failedResponse(res, error);
   }

@@ -1,4 +1,4 @@
-const { errorLogs } = require("../utils/log");
+const { errorLogs } = require("./log");
 
 const response = (res, data, message, error) => {
   res.json({
