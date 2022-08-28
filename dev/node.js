@@ -11,6 +11,9 @@ const {
   transaction,
   mine,
   transactionBroadcast,
+  chain,
+  testingNodes,
+  testingNode,
 } = require("../utils/endpoints");
 const uuid = require("uuid");
 
@@ -21,7 +24,7 @@ const app = express();
 
 app.use(bodyParser.json());
 
-app.get("/", (req, res) => {
+app.get(chain, (req, res) => {
   try {
     response(res, botCoin);
   } catch (error) {
@@ -175,5 +178,20 @@ app.post(registerNodesBulk, (req, res) => {
 });
 
 app.listen(port, function () {
+  if (botCoin.currentNodeURL == testingNode) {
+    let allPromisses = [];
+    testingNodes.forEach(async (newNodeURL) => {
+      await axios({
+        url: botCoin.currentNodeURL + registerAndBroadcastNode,
+        method: "POST",
+        data: {
+          newNodeURL,
+        },
+      });
+    });
+    Promise.all(allPromisses).catch((e) => {
+      console.log(e);
+    });
+  }
   console.log(`Blockchain node is ${port}`);
 });
