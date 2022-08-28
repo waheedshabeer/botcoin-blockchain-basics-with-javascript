@@ -14,6 +14,7 @@ const {
   chain,
   testingNodes,
   testingNode,
+  receiveNewBlock,
 } = require("../utils/endpoints");
 const uuid = require("uuid");
 
@@ -42,17 +43,42 @@ app.get(mine, (req, res) => {
     };
     const nonse = botCoin.proofOfWork(previousBlockHash, currentBlockData);
     const hash = botCoin.hashBlock(previousBlockHash, currentBlockData, nonse);
-    botCoin.createNewTransaction(minningReward, "REWARD", nodeAddress);
     const newBlock = botCoin.createNewBlockChain(
       nonse,
       previousBlockHash,
       hash
     );
 
+    let allPromisses = [];
+    botCoin.networkNodes.forEach((nodeURL) => {
+      allPromisses.push(
+        axios({
+          url: nodeURL + receiveNewBlock,
+          data: { newBlock },
+          method: "POST",
+        })
+      );
+    });
+    Promise.all(allPromisses).then(async () => {
+      try {
+        await axios({
+          url: botCoin.currentNodeURL + transactionBroadcast,
+          data: {
+            amount: minningReward,
+            senderAddress: "REWARD",
+            receiverAddress: nodeAddress,
+          },
+          method: "POST",
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    });
+
     response(
       res,
       { newBlock, BlockChain: botCoin },
-      "New block mined successfully"
+      "New block mined and broascasted successfully"
     );
   } catch (error) {
     failedResponse(res, error);
@@ -101,6 +127,30 @@ app.post(transactionBroadcast, (req, res) => {
         `Transaction is broadcasted to ${botCoin.networkNodes.length} nodes and will be saved at Block ${block}`
       );
     });
+  } catch (error) {
+    failedResponse(res, error);
+  }
+});
+
+app.post(receiveNewBlock, (req, res) => {
+  try {
+    const { newBlock } = req.body;
+    const lastBlock = botCoin.getLastNode();
+    const isCorrectHash =
+      lastBlock.previousBlockHash === newBlock.previousBlockHash;
+    const isCorrectIndex = lastBlock.index + 1 === newBlock.index;
+
+    if (isCorrectHash && isCorrectIndex) {
+      botCoin.chain.push(newBlock);
+      botCoin.pendingTransactions = [];
+      response(
+        res,
+        req.body,
+        `Broadcasted block is accepted and added into chain`
+      );
+    } else {
+      failedResponse(res, "Broadcasted block is rejected");
+    }
   } catch (error) {
     failedResponse(res, error);
   }

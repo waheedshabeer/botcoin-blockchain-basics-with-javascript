@@ -13,6 +13,7 @@ const testingNodes = [
   "http://localhost:3005",
   "http://localhost:3006",
 ];
+const receiveNewBlock = "/receive-new-block";
 
 module.exports = {
   chain,
@@ -24,4 +25,5 @@ module.exports = {
   transactionBroadcast,
   testingNode,
   testingNodes,
+  receiveNewBlock,
 };
