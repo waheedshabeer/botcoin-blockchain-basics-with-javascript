@@ -70,14 +70,42 @@ BlockChain.prototype.proofOfWork = function (
   previousBlockHash,
   currentBlockData
 ) {
-  let nonse = 0;
-  let hash = this.hashBlock(previousBlockHash, currentBlockData, nonse);
+  let nonce = 0;
+  let hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
 
   while (hash.substring(0, 4) !== "0000") {
-    nonse++;
-    hash = this.hashBlock(previousBlockHash, currentBlockData, nonse);
+    nonce++;
+    hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
   }
-  return nonse;
+  return nonce;
+};
+
+BlockChain.prototype.isChainValid = function (blockChain) {
+  let isValid = true;
+  for (let index = 1; index < blockChain.length; index++) {
+    const currentBlock = blockChain[index];
+    const previousBlock = blockChain[index - 1];
+    const currentBlockForHashBlock = {
+      transactions: previousBlock.transactions,
+      index: currentBlock.index,
+    };
+    const hashForCheck = this.hashBlock(
+      previousBlock.hash,
+      currentBlockForHashBlock,
+      currentBlock.nonce
+    );
+
+    if (hashForCheck.substring(0, 4) !== "0000") isValid = false;
+    if (currentBlock.previousHash !== previousBlock.hash) isValid = false;
+
+    const GENISISBLOCK = blockChain[0];
+    const correctnonce = GENISISBLOCK.nonce === 100;
+    const correctPreviousHash = GENISISBLOCK.previousHash === "00";
+    const correctHash = GENISISBLOCK.hash === "GENISISBLOCK";
+
+    if (!correctnonce || !correctPreviousHash || !correctHash) isValid = false;
+  }
+  return isValid;
 };
 
 module.exports = BlockChain;

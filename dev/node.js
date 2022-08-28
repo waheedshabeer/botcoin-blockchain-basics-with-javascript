@@ -39,7 +39,7 @@ app.get(mine, (req, res) => {
     const previousBlockHash = lastBlock.hash;
     const currentBlockData = {
       transactions: lastBlock.transactions,
-      index: lastBlock.index,
+      index: lastBlock.index + 1,
     };
     const nonse = botCoin.proofOfWork(previousBlockHash, currentBlockData);
     const hash = botCoin.hashBlock(previousBlockHash, currentBlockData, nonse);
