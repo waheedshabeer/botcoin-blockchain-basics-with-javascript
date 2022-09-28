@@ -1,0 +1,6 @@
+app.get("/mine", (req, res) => {
+  try {
+  } catch (error) {
+    failedResponse(res, error);
+  }
+});

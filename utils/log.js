@@ -3,5 +3,6 @@ const logData = (data, stringyfy) => {
   console.log(stringyfy ? JSON.stringify(data) : data);
   console.log("====================================");
 };
+const errorLogs = true;
 
-module.exports = { logData };
+module.exports = { logData, errorLogs };
