@@ -1,3 +1,7 @@
+const { blockChain } = require("../tests/data");
 const { logData } = require("../utils/log");
+const BotCoin = require("./blockChain");
 
-logData("Hello BlockChain");
+const botCoin = new BotCoin();
+
+logData(botCoin.isChainValid(blockChain.chain));
